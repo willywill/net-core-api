@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -20,15 +21,22 @@ namespace Server.Controllers
 
         // GET api/<controller>/5
         [HttpGet("{id:int}")]
-        public string Get(int id)
-        {
-            return $"value {id}";
-        }
+        public string Get(int id, string query) => $"value {id} query {query}";
 
         // POST api/<controller>
         [HttpPost]
-        public void Post([FromBody]string value)
+        public IActionResult Post([FromBody]ValueTest value)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Save this to the database in the real example.
+            else
+            {
+                return CreatedAtAction("Get", new { id = value.Id }, value);
+            }
         }
 
         // PUT api/<controller>/5
@@ -43,4 +51,11 @@ namespace Server.Controllers
         {
         }
     }
+}
+
+public class ValueTest
+{
+    public int Id { get; set; }
+    [MinLength(3)]
+    public string Text { get; set; }
 }
