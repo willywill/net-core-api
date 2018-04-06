@@ -48,6 +48,14 @@ namespace Server.Services
         public async Task DeleteTodo(string id) => await TodoCollection.DeleteOneAsync(todo => todo.TodoId == id);
 
         /// <summary>
+        /// Updates a single todo from the database, that matches the id parameter.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="todo"></param>
+        /// <returns></returns>
+        public async Task UpdateTodo(string id, TodoModel todo) => await TodoCollection.ReplaceOneAsync(x => x.TodoId == id, todo);
+
+        /// <summary>
         /// Retrieves all todos in the database.
         /// </summary>
         /// <returns></returns>

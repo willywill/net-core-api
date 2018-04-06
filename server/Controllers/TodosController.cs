@@ -72,6 +72,23 @@ namespace Server.Controllers
             }
         }
 
+        // PUT api/<controller>/5
+        [HttpPut("{id}")]
+        public async Task Update(string id, [FromBody]TodoModel todo)
+        {
+            try
+            {
+                await mongoService.UpdateTodo(id, todo);
+                var message = new { Message = "Todo Updated!" };
+                Ok(message);
+            }
+
+            catch (ApplicationException ex)
+            {
+                BadRequest(ex.Message);
+            }
+        }
+
         // DELETE api/<controller>/5
         [HttpDelete("{id}")]
         public async Task Delete(string id)
