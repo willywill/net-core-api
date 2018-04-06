@@ -11,10 +11,9 @@ namespace Server.Models
     public class TodoModel
     {
         [BsonId]
-        public ObjectId TodoId { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string TodoId { get; set; }
         [BsonRequired]
-        public string Title { get; set; }
-        public bool Completed { get; set; }
-        public DateTime? Deadline { get; set; } = null;
+        public string TodoDescription { get; set; }
     }
 }

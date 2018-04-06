@@ -22,8 +22,35 @@ namespace Server.Services
             TodoCollection = mongoDatabase.GetCollection<TodoModel>(collectionName);
         }
 
+        /// <summary>
+        /// Adds a todo to the database.
+        /// </summary>
+        /// <param name="todo"></param>
+        /// <returns></returns>
         public async Task AddTodo(TodoModel todo) => await TodoCollection.InsertOneAsync(todo);
 
+        /// <summary>
+        /// Retrieves a single todo that matches the parameter.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<List<TodoModel>> GetTodo(string id)
+        {
+            var doc = await TodoCollection.Find(todo => todo.TodoId == id).ToListAsync();
+            return doc; 
+        }
+
+        /// <summary>
+        /// Deletes a single todo from the database, that matches the parameter.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task DeleteTodo(string id) => await TodoCollection.DeleteOneAsync(todo => todo.TodoId == id);
+
+        /// <summary>
+        /// Retrieves all todos in the database.
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<TodoModel>> GetAllTodos()
         {
             var todos = new List<TodoModel>();

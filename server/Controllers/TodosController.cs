@@ -7,6 +7,8 @@ using System.ComponentModel.DataAnnotations;
 
 using Microsoft.AspNetCore.Mvc;
 
+using MongoDB.Bson;
+
 using Server.Models;
 using Server.Services;
 
@@ -17,42 +19,74 @@ namespace Server.Controllers
     [Route("api/[controller]")]
     public class TodosController : ControllerBase
     {
+
+        private static string databaseUri = ConfigurationManager.AppSettings["DatabaseURI"];
+        private MongoDBService mongoService = new MongoDBService("net-core-todos", "Todos", databaseUri);
+
         // GET: api/<controller>
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            string databaseUri = ConfigurationManager.AppSettings["DatabaseURI"];
-            var mongoService = new MongoDBService("net-core-todos", "Todos", databaseUri);
-            var allTodos = await mongoService.GetAllTodos();
+            try
+            {
+                var allTodos = await mongoService.GetAllTodos();
+                return Ok(allTodos);
+            }
 
-            return Ok(allTodos);
+            catch (ApplicationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // GET api/<controller>/5
         [HttpGet("{id}")]
-        public void Get(int id)
+        public async Task<IActionResult> Get(string id)
         {
+            try
+            {
+                var todo = await mongoService.GetTodo(id);
+                return Ok(todo);
+            }
+
+            catch (ApplicationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // POST api/<controller>
         [HttpPost]
         public async Task Post([FromBody]TodoModel todo)
         {
-            string databaseUri = ConfigurationManager.AppSettings["DatabaseURI"];
-            var mongoService = new MongoDBService("net-core-todos", "Todos", databaseUri);
-            await mongoService.AddTodo(todo);
-        }
+            try
+            {
+                await mongoService.AddTodo(todo);
+                var message = new { Message = "Todo Added!" };
+                Ok(message);
+            }
 
-        // PUT api/<controller>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
+            catch (ApplicationException ex)
+            {
+                BadRequest(ex.Message);
+            }
         }
 
         // DELETE api/<controller>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task Delete(string id)
         {
+            try
+            {
+                await mongoService.DeleteTodo(id);
+                var message = new { Message = "Todo Deleted!" };
+                Ok(message);
+            }
+
+            catch (ApplicationException ex)
+            {
+                BadRequest(ex.Message);
+            }
         }
     }
 }
